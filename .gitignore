@@ -1,0 +1,5 @@
+merchex/db.sqlite3
+/env
+merchex/merchex/__pycache__/urls.cpython-312.pyc
+merchex/merchex/__pycache__/settings.cpython-312.pyc
+merchex/merchex/__pycache__/__init__.cpython-312.pyc
