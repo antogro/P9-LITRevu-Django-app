@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>Créer une critique</h2>
+
+  <!-- Formulaire pour créer un nouveau ticket -->
+  {% if not ticket %}
+    <h3>Créer un nouveau ticket :</h3>
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ ticket_form.as_p }}
+      <h3>Ajouter votre critique pour ce ticket :</h3>
+      {{ review_form.as_p }}
+      <button type="submit">Soumettre le ticket et la critique</button>
+    </form>
+  {% else %}
+    <!-- Formulaire pour ajouter une critique à un ticket existant -->
+    <h3>Ajouter une critique pour le ticket : "{{ ticket.title }}"</h3>
+    <form method="POST">
+      {% csrf_token %}
+      {{ review_form.as_p }}
+      <button type="submit">Soumettre la critique</button>
+    </form>
+  {% endif %}
+{% endblock %}

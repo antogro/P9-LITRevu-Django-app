@@ -1,4 +1,83 @@
 {% extends 'base.html' %}
 {% block content %}
-    <p>Vous êtes conecter</p>
-{% endblock content %}
+    <div class="link_ticket_review">
+       <a class="ticket_button" href="{% url 'create_ticket' %}">Demander une critique</a>
+       <a class="review_button" href="{% url 'create_review' %}">Créer une critique</a>
+    </div>
+{% for item in combined %}
+    {% if item.is_ticket %}
+        <div class="ticket_and_review">
+            <div class="ticket_review">
+                {% if item.reviews %}
+                {% for review in item.reviews %}
+                <div class="date_time">
+                    <h4>Critiques pour ce ticket :</h4>
+                    <p class="time">{{ review.time_created }}</p>
+                </div>
+                <div class="answer_review">
+                    <p><strong>{{ review.user }}</strong> a répondu au ticket de <strong>{{ item.ticket.user }}</strong></p>
+                    <strong>{{ review.headline }} - </strong>
+                    <span class="star-rating">
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= review.rating %}
+                                <i class="fas fa-star checked"></i>
+                            {% else %}
+                                <i class="fas fa-star"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </span>
+                    <p>{{ review.body }}</p>
+                </div>
+                {% endfor %}
+                {% else %}
+                    <p>Aucune critique pour ce ticket.</p>
+                {% endif %}
+            </div>
+            <div class="ticket">
+                <div class="date_time">
+                    <h4>{{ item.ticket.user }} a demandé une critique</h4>
+                    <p class="time">{{ item.ticket.time_created }}</p>
+                </div>
+                <div class="ask_review">
+                    <strong>{{ item.ticket.title }}</strong>
+                    <p>{{ item.ticket.description }}</p>
+                    {% if item.ticket.image %}
+                        <img src="{{ item.ticket.image.url }}" alt="Image de {{ item.ticket.title }}">
+                    {% endif %}
+                    {% if not item.has_user_review %}
+                        <br> <a class="create_review_with_ticket" href="{% url 'create_review_with_ticket' item.ticket.id %}">Créer une critique</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="critique">
+            <h3>Critique par {{ item.review.user }}</h3>
+            <p>{{ item.review.user }} a répondu au ticket de {{ item.ticket.user }}</p>
+            <strong>{{ item.review.headline }}</strong>
+            <p>{{ item.review.body }}</p>
+            <span class="star-rating">
+                {% for i in "12345" %}
+                    {% if forloop.counter <= item.review.rating %}
+                        <i class="fas fa-star checked"></i>
+                    {% else %}
+                        <i class="fas fa-star"></i>
+                    {% endif %}
+                {% endfor %}
+            </span>
+            <div class="review_ticket">
+                <h4>Ticket associé :</h4>
+                <strong>{{ item.ticket.title }}</strong>
+                <p>{{ item.ticket.description }}</p>
+                {% if item.ticket.image %}
+                    <img src="{{ item.ticket.image.url }}" alt="Image de {{ item.ticket.title }}">
+                {% endif %}
+                <button class="button_edit"><a href="{% url 'edit_ticket' item.ticket.id %}">Modifier la demande de critique</a></button>
+                <p>Créé le : {{ item.ticket.time_created }}</p>
+            </div>
+        </div>
+    {% endif %}
+{% empty %}
+    <p>Aucun ticket ou critique disponible.</p>
+{% endfor %}
+{% endblock %}

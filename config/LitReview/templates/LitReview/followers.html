@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Ajouter un utilisateur à suivre</h2>
+<form method="GET" action="{% url 'follow_user' %}">
+    {% csrf_token %}
+    <input type="text" name="username" placeholder="Nom d'utilisateur" required>
+    <button type="submit">Suivre</button>
+    {% if messages %}
+    <ul>
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</form>
+
+<h2>Utilisateurs que vous suivez</h2>
+<ul>
+    {% for follow in followed_users %}
+        <li>
+            {{ follow.followed_user.username }}
+            <form method="POST" action="{% url 'unfollow_user' %}" style="display:inline;">
+                {% csrf_token %}
+                <input type="hidden" name="unfollow_username" value="{{ follow.followed_user.username }}">
+                <button type="submit">Se désabonner</button>
+            </form>
+        </li>
+    {% empty %}
+        <li>Vous ne suivez personne.</li>
+    {% endfor %}
+</ul>
+
+<h2>Vos followers</h2>
+<ul>
+    {% for follow in followers %}
+        <li>{{ follow.user.username }}</li>
+    {% empty %}
+        <li>Personne ne vous suit.</li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

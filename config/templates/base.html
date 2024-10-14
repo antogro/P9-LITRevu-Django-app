@@ -1,14 +1,37 @@
-
+{% load static %}
+<!DOCTYPE html>
 <html>
-    <head>
-        <title>LITReview</title>
-    </head>
-    <body>
-        <h1>LITREview</h1>
-        {% block content %}{% endblock content %}
-        {%  if user.is_authenticated %}
-            <p>Vous êtes connecté en tant que {{ user }}. <a href="{% url 'logout' %}">Se déconnecter</a></p>
-            <p>Voulez-vous <a href="{% url 'password_change' %}">changer votre mot de passe ?</a></p>
+
+<head>
+    <title>LITReview</title>
+    <link rel="stylesheet" type="text/css" href="{% static '\css\style3.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="icon" type="image/png" href="{% static 'favicon_io/favicon-32x32.png' %}">
+</head>
+
+<body>
+    <header>
+        <div class="title">
+        <img id="icon" src="{% static 'favicon_io\android-chrome-512x512.png' %}">
+        </a>
+        </div>  
+        {% if user.is_authenticated %}
+        <p>Bienvenue <strong>{{ user.username }}</strong> sur LITReview.</p>
+        <div class="link_input_connect">
+            
+            <a class="flux_link" href="{% url 'home' %}">Flux</a>
+            <a class="posts_link" href="{% url 'my_posts' %}">Mes Publications</a>
+            <a class="followers_link" href="{% url 'followers' %}">Abonnements</a>
+            <a class="password_link" href="{% url 'password_change' %}">Changer mot de passe</a>
+            <form method="POST" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <a href="#" class="logout_link" onclick="if(confirm('Voulez-vous vous déconnecter?')) { this.closest('form').submit(); return false; }">Se déconnecter</a>
+            </form>
+        </div>
+        
         {% endif %}
-    </body>
+    </header>
+    {% block content %}{% endblock content %}
+</body>
+
 </html>

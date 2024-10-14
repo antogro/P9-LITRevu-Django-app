@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+    <h2>Modifier le billet</h2>
+    <form enctype="multipart/form-data" method="post">
+        {% csrf_token %}
+        {{ edit_form.as_p }}
+        <button type="submit" name="edit_ticket">Enregistrer les modifications</button>
+    </form>
+   
+    <form method="post">
+        {% csrf_token %}
+        {{ delete_form.as_p }}
+        <button type="submit" name="delete_ticket" onclick="return confirm('Voulez-vous vraiment supprimer votre ticket ?')">Supprimer le ticket</button>
+    </form>
+{% endblock content %}
