@@ -4,7 +4,7 @@
 
 <head>
     <title>LITReview</title>
-    <link rel="stylesheet" type="text/css" href="{% static '\css\style3.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static '\css\style.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <link rel="icon" type="image/png" href="{% static 'favicon_io/favicon-32x32.png' %}">
 </head>
@@ -13,7 +13,6 @@
     <header>
         <div class="title">
         <img id="icon" src="{% static 'favicon_io\android-chrome-512x512.png' %}">
-        </a>
         </div>  
         {% if user.is_authenticated %}
         <p>Bienvenue <strong>{{ user.username }}</strong> sur LITReview.</p>

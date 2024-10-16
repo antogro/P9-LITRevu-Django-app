@@ -1,34 +1,294 @@
-.ticket_and_review, .ticket_review {
-    margin: 0 2% 0% 2% ;
-    display: flex;
-    flex-direction: column;
-    border-radius: 6px;
-    box-shadow: 2px;
-    border-width: 2px;
-    border-style: solid;
-}
-
 body {
     font-family: Arial, sans-serif;
     text-align: center;
+    font-size: larger;
+}
+
+.title {
+    align-self: center;
+    border: 2px solid #111111;
+    margin: 1% 2% 0% 2%;
+    background-color: #111111;
+    border-radius: 50px;
+}
+
+#icon {
+    margin: 0;
+    padding: 0.2%;
+    width: 10%;
+    border-radius: 5px;
+}
+
+.ticket_and_review {
+    margin: 0 22% 0.4% 22%;
+    display: flex;
+    flex-direction: column;
+    border-radius: 50px;
+    border: 2px solid;
+    background-color: #a3a681;
+    padding: 0.7%;
+}
+
+.ticket_review,
+.ticket,
+.users_followed,
+.followed_users,
+.blocked_users {
+    border-radius: 50px;
+    border: 2px solid;
+    margin: 0 25% 0% 25%;
+    background-color: rgb(255, 255, 255);
+}
+
+.create_ticket {
+    margin: 0 30% 0% 30%;
+    background-color: rgb(255, 255, 255);
+}
+
+.date_time {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    padding: 0 2% 0 1%;
+    border-radius: 52px 45px 34px 28px / 50px 39px 35px 47px;
+    border-bottom: 2px solid;
+    margin: 0;
+    height: 60px;
+}
+
+.followed_users h3,
+.users_followed h3,
+.create_ticket h3,
+.blocked_users h3 {
+    padding: 1% 2% 0 1%;
+    border-radius: 115px 115px 61px 60px / 105px 105px 34px 32px;
+    border-bottom: 2px solid;
+    margin: 0;
+    height: 45px;
+    background-color: #a3a681;
+}
+
+.follow {
+    margin: 10px;
+}
+
+.answer_review,
+.ask_review,
+.followed_users,
+.blocked_users {
+    margin-top: 1%;
+}
+
+.time {
+    font-size: medium;
+    margin-top: 5%;
+}
+
+#id_username {
+    margin: 0;
+}
+
+.date_time h4 {
+    font-size: large;
+}
+
+img {
+    width: 300px;
+    margin-bottom: 1%;
+}
+
+.create_review_with_ticket {
+    display: inline-block;
+    border: 2px solid;
+    border-radius: 30px;
+    background-color: #a3a681;
+    padding: 1%;
+    margin-bottom: 1%;
+    color: white;
+    text-decoration: none;
+}
+
+.star-rating {
+    color: #ddd;
+}
+
+.star-rating .fa-star.checked {
+    color: #ffcc00;
 }
 
 .link_input_connect {
     display: flex;
-    flex-direction: row-reverse;
-    gap: 10px;
-    border-radius: 6px;
-    box-shadow: 2px;
-    border-width: 2px;
-    border-style: solid;
-    margin: 0 2% 0 2%;
+    flex-direction: row;
+    gap: 15px;
+    border-radius: 30px;
+    border: 2px solid;
+    margin: 0 12% 0.4% 12%;
+
+    justify-content: flex-end;
+    background-color: #a3a681;
+    align-items: center;
+}
+
+.link_ticket_review {
+    display: flex;
+    flex-direction: row;
+    gap: 1%;
+    margin: 0.2%;
     padding: 1%;
-    
+    justify-content: center;
 }
 
-#icon  {
-    width: 100px;
+.ticket_button,
+.review_button {
+    border-color: #000000;
+    padding: 0.4%;
+}
+
+.ticket_button,
+.review_button,
+.flux_link,
+.posts_link,
+.followers_link,
+.password_link,
+.logout_link {
+    border: 2px solid;
+    border-radius: 30px;
+    background-color: #a3a681;
+    padding: 5px;
+    color: white;
+    margin: 10px;
+    text-decoration: none;
+    border-color: #a3a681;
 
 }
 
+.ticket_button:hover,
+.review_button:hover,
+.create_review_with_ticket:hover,
+.flux_link:hover,
+.posts_link:hover,
+.followers_link:hover,
+.password_link:hover,
+.logout_link:hover,
+.button_delete:hover,
+.button_edit:hover,
+.follow_button:hover,
+.unfollow_button:hover {
+    color: #0a1f0b;
+    text-decoration: none;
+    border-color: #000000;
+}
 
+.critique {
+    margin: 0 12% 0.4% 12%;
+    border-radius: 50px;
+    border: 2px solid;
+    background-color: #a3a681;
+    padding: 0.7%;
+}
+
+.review_ticket {
+    border-radius: 50px;
+    border: 2px solid;
+    margin: 1% 30% 1% 30%;
+    background-color: rgb(255, 255, 255);
+    padding: 1%;
+}
+
+.button_edit,
+.button_delete,
+.follow_button,
+.unfollow_button {
+    display: inline-block;
+    border: 2px solid;
+    border-color: #a3a681;
+    border-radius: 30px;
+    color: white;
+    background-color: #a3a681;
+    text-decoration: none;
+    padding: 0.7% 1%;
+    margin: 0.4% 0;
+}
+
+.button_edit a,
+.button_delete a,
+.follow_button button,
+.unfollow_button button {
+    color: white;
+    text-decoration: none;
+}
+
+/* Styles pour les inputs utilisateur */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+textarea,
+select {
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    padding: 10px 15px;
+    border: 2px solid #a3a681;
+    border-radius: 30px;
+    background-color: #ffffff;
+    color: #111111;
+    width: calc(100% - 40px);
+    max-width: 300px;
+}
+
+input[type="file"] {
+    margin-left: 60px;
+}
+
+.id_description {
+    font-size: 160px;
+}
+
+input[type="submit"],
+button[type="submit"],
+input[type="file"] {
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    padding: 10px 20px;
+    border: 2px solid #a3a681;
+    border-radius: 30px;
+    background-color: #a3a681;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    max-width: 300px;
+}
+
+input[type="submit"]:hover,
+button[type="submit"]:hover,
+input[type="file"]:hover {
+    background-color: #ffffff;
+    color: #0a1f0b;
+    border-color: #000000;
+}
+
+/* Style pour le focus des inputs */
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+input[type="number"]:focus,
+input[type="file"]:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: #0a1f0b;
+    box-shadow: 0 0 5px rgba(163, 166, 129, 0.5);
+}
+
+/* Style pour les labels */
+label {
+    display: inline-block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #111111;
+}
+
+/* Style pour les groupes de formulaires */
+.form-group {
+    margin-bottom: 20px;
+}

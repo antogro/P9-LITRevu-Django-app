@@ -4,6 +4,7 @@
   <h2>Créer une critique</h2>
 
   <!-- Formulaire pour créer un nouveau ticket -->
+  <div class="create_ticket">
   {% if not ticket %}
     <h3>Créer un nouveau ticket :</h3>
     <form method="POST" enctype="multipart/form-data">
@@ -21,5 +22,6 @@
       {{ review_form.as_p }}
       <button type="submit">Soumettre la critique</button>
     </form>
+  </div>
   {% endif %}
 {% endblock %}

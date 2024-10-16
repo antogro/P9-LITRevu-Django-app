@@ -35,7 +35,8 @@ urlpatterns = [
     path(
         "",
         LoginView.as_view(
-            template_name="authentication/login.html", redirect_authenticated_user=True
+            template_name="authentication/login.html",
+            redirect_authenticated_user=True
         ),
         name="login",
     ),
@@ -56,12 +57,17 @@ urlpatterns = [
     ),
     path("signup/", authentication.views.signup_page, name="signup"),
     #  LitReview
-    # Followers
+    # Followers and blocked user
+    path("block/", LitReview.views.blocked_user, name="blocked_user"),
+    path("unblock/", LitReview.views.unblock_user, name="unblock_user"),
     path("follow/", LitReview.views.follow_user, name="follow_user"),
     path("unfollow/", LitReview.views.unfollow_user, name="unfollow_user"),
     path("followers/", LitReview.views.followers, name="followers"),
     # creat a ticket
-    path("create-ticket/", LitReview.views.create_ticket, name="create_ticket"),
+    path(
+        "create-ticket/",
+        LitReview.views.create_ticket,
+        name="create_ticket"),
     path(
         "create-review/<int:ticket_id>/",
         LitReview.views.create_review,
@@ -97,4 +103,6 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(
+        settings.MEDIA_URL,
+        document_root=settings.MEDIA_ROOT)

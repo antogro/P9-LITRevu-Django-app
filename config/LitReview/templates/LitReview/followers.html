@@ -1,43 +1,82 @@
 {% extends 'base.html' %}
-
 {% block content %}
-<h2>Ajouter un utilisateur à suivre</h2>
-<form method="GET" action="{% url 'follow_user' %}">
-    {% csrf_token %}
-    <input type="text" name="username" placeholder="Nom d'utilisateur" required>
-    <button type="submit">Suivre</button>
+<h3>Rechercher un utilisateur</h3>
+<div class="search_user">
+    <div class="action-buttons">
+        <input type="text" name="username" id="usernameInput" placeholder="Nom d'utilisateur" required>
+        <form method="GET" action="{% url 'follow_user' %}" style="display: inline;">
+            <input type="hidden" name="username" class="username-field">
+            <button class="follow_button" type="submit">Suivre</button>
+        </form>
+        <form method="POST" action="{% url 'blocked_user' %}" style="display: inline;">
+            {% csrf_token %}
+            <input type="hidden" name="blocked_username" class="username-field">
+            <button class="block_button" type="submit">Bloquer</button>
+        </form>
+    </div>
     {% if messages %}
-    <ul>
         {% for message in messages %}
-            <li>{{ message }}</li>
+            {{ message }}
         {% endfor %}
-    </ul>
     {% endif %}
-</form>
+</div>
 
-<h2>Utilisateurs que vous suivez</h2>
-<ul>
-    {% for follow in followed_users %}
-        <li>
-            {{ follow.followed_user.username }}
-            <form method="POST" action="{% url 'unfollow_user' %}" style="display:inline;">
-                {% csrf_token %}
-                <input type="hidden" name="unfollow_username" value="{{ follow.followed_user.username }}">
-                <button type="submit">Se désabonner</button>
-            </form>
-        </li>
-    {% empty %}
-        <li>Vous ne suivez personne.</li>
-    {% endfor %}
-</ul>
+<div class="users_followed">
+    <h3>Utilisateurs que vous suivez</h3>
+    <div class="follow">
+        {% for follow in followed_users %}
+            <div class="user-item">
+                {{ follow.followed_user.username }}
+                <form method="POST" action="{% url 'unfollow_user' %}" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="unfollow_username" value="{{ follow.followed_user.username }}">
+                    <button class="unfollow_button" type="submit">Se désabonner</button>
+                </form>
+            </div>
+        {% empty %}
+            <p>Vous ne suivez personne.</p>
+        {% endfor %}
+    </div>
+</div>
 
-<h2>Vos followers</h2>
-<ul>
-    {% for follow in followers %}
-        <li>{{ follow.user.username }}</li>
-    {% empty %}
-        <li>Personne ne vous suit.</li>
-    {% endfor %}
-</ul>
+<div class="followed_users">
+    <h3>Vos followers</h3>
+    <div class="follow">
+        {% for follow in followers %}
+            <div class="user-item">
+                {{ follow.user.username }}
+            </div>
+        {% empty %}
+            <p>Personne ne vous suit.</p>
+        {% endfor %}
+    </div>
+</div>
 
+<div class="blocked_users">
+    <h3>Utilisateurs bloqués</h3>
+    <div class="block">
+        {% for block in blocked_users %}
+            <div class="user-item">
+                {{ block.blocked_user.username }}
+                <form method="POST" action="{% url 'unblock_user' %}" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="unblock_username" value="{{ block.blocked_user.username }}">
+                    <button class="unblock_button" type="submit">Débloquer</button>
+                </form>
+            </div>
+        {% empty %}
+            <p>Vous n'avez bloqué aucun utilisateur.</p>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('input', function(e) {
+    if (e.target.id === 'usernameInput') {
+        document.querySelectorAll('.username-field').forEach(function(field) {
+            field.value = e.target.value;
+        });
+    }
+});
+</script>
 {% endblock %}
