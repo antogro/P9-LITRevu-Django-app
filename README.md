@@ -74,10 +74,15 @@ Avant de lancer l'application, assurez-vous d'avoir configuré la base de donné
 
 ```bash
 cd config
+```
+```bash
+python manage.py makemigrations
+```
+```bash
 python manage.py migrate
 ```
 
-    **Explication** : Cette commande applique les migrations, qui sont des modifications de la structure de la base de données définies dans les fichiers de migration. Elle s'assure que la base de données est à jour avec les modèles Django.
+**Explication** : Cette commande applique les migrations, qui sont des modifications de la structure de la base de données définies dans les fichiers de migration. Elle s'assure que la base de données est à jour avec les modèles Django.
 
 2. **Lancer le serveur de développement** :
 
@@ -85,7 +90,7 @@ python manage.py migrate
 python manage.py runserver
 ```
 
-    **Explication** : Cette commande démarre le serveur de développement Django, qui vous permet d'accéder à l'application localement via votre navigateur à l'adresse suivante : `http://127.0.0.1:8000/`. Vous pouvez l'utiliser pour tester l'application sur votre machine avant de la déployer en production.
+**Explication** : Cette commande démarre le serveur de développement Django, qui vous permet d'accéder à l'application localement via votre navigateur à l'adresse suivante : `http://127.0.0.1:8000/`. Vous pouvez l'utiliser pour tester l'application sur votre machine avant de la déployer en production.
 
 ## Utilisation
 
