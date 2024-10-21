@@ -1,10 +1,27 @@
 {% extends 'base.html' %}
-{% block content %}
 
-    <h2>Créer un ticket</h2>
-    <form method="post" enctype="multipart/form-data">
+{% block content %}
+    <h2 class="form-title">Créer un ticket</h2>
+    <form method="post" enctype="multipart/form-data" class="edit-review-form">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Soumettre</button>
+        <!-- Formulaire de création de ticket -->
+        <div class="form-group">
+            <label for="title" class="form-label">Titre du ticket :</label>
+            <input type="text" id="title" name="title" value="{{ form.title.value|default_if_none:'' }}" required class="form-input">
+        </div>
+
+        <div class="form-group">
+            <label for="description" class="form-label">Description :</label>
+            <textarea id="description" name="description" rows="4" class="form-textarea">{{ form.description.value|default_if_none:'' }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="image" class="form-label">Image :</label>
+            <input type="file" id="image" name="image" class="form-input">
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="submit-button">Soumettre</button>
+        </div>
     </form>
 {% endblock content %}

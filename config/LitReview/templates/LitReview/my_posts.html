@@ -1,54 +1,77 @@
 {% extends 'base.html' %}
 {% block content %}
     <h2>Mes publications</h2>
-
+    {% if messages %}
+    {% for message in messages %}
+        {{ message }}
+    {% endfor %}
+    {% endif %}
     {% for post in combined_posts %}
         {% if post.is_ticket %}
             <div class="ticket_and_review">
-                <div class="ticket">
+                <div class="ticket" role="region" aria-labelledby="ticket-{{ post.ticket.id }}">
                     <div class="date_time">
-                        <h4>Ticket: {{ post.ticket.title }}</h4>
+                        <h3>Ticket: {{ post.ticket.title }}</h3>
                         <p class="time">{{ post.ticket.time_created }}</p>
                     </div>
                     <div class="ask_review">
+                        <strong><p>{{ post.ticket.user }}</p></strong>
                         <p>{{ post.ticket.description }}</p>
                         {% if post.ticket.image %}
                             <img src="{{ post.ticket.image.url }}" alt="Image pour {{ post.ticket.title }}">
                         {% endif %}
                         
                         <div class="actions">
-                            <a class="button_edit" href="{% url 'edit_ticket' post.ticket.id %}">Modifier</a> </br>
-                            <a href="{% url 'delete_ticket' post.ticket.id %}" class="button_delete">Supprimer</a>
+                            <form action="{% url 'edit_ticket' post.ticket.id %}" method="GET">
+                                <button type="submit" class="button_edit" aria-label="Modifier le ticket {{ post.ticket.title }}">
+                                    Modifier
+                                </button>
+                            </form>
+                            <form action="{% url 'delete_ticket' post.ticket.id %}" method="POST">
+                                {% csrf_token %}
+                                <button type="submit" class="button_delete" aria-label="Supprimer le ticket {{ post.ticket.title }}">
+                                    Supprimer
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
 
                 {% if post.reviews %}
-                    <div class="ticket_review">
-                        {% for review in post.reviews %}
-                        <div class="date_time">
-                            <h4>Vos critiques pour ce ticket:</h4>
-                            <p class="time">{{ review.time_created }}</p>
-                        </div>
-                            <div class="answer_review">
-                                <p><strong>{{ review.user.username }}</strong></p>
-                                <span class="star-rating">
-                                    {% for i in "12345" %}
-                                        {% if forloop.counter <= review.rating %}
-                                            <i class="fas fa-star checked"></i>
-                                        {% else %}
-                                            <i class="fas fa-star"></i>
-                                        {% endif %}
-                                    {% endfor %}
-                                </span>
-                                <p>{{ review.body }}</p>
-                            </div>
-                        {% endfor %}
-                        <div class="actions">
-                            <a class="button_edit" href="{% url 'edit_ticket' post.ticket.id %}">Modifier</a> </br>
-                            <a href="{% url 'delete_ticket' post.ticket.id %}" class="button_delete">Supprimer</a>
-                        </div>
+                <div class="ticket_review" role="region" aria-labelledby="critique-{{ post.ticket.id }}">
+                    {% for review in post.reviews %}
+                    <div class="date_time">
+                        <h3>Vos critiques pour ce ticket: "{{ post.ticket.title }}"</h3>
+                        <p class="time">{{ review.time_created }}</p>
                     </div>
+                    <div class="answer_review">
+                        <p><strong>{{ review.user.username }}</strong></p>
+                        <span class="star-rating">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= review.rating %}
+                                    <i class="fas fa-star checked" aria-label="Étoile pleine"></i>
+                                {% else %}
+                                    <i class="fas fa-star" aria-label="Étoile vide"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </span>
+                        <p>{{ review.body }}</p>
+                    </div>
+                    <div class="actions">
+                        <form action="{% url 'edit_review' review.id %}" method="GET">
+                            <button type="submit" class="button_edit" aria-label="Modifier la critique {{ review.ticket.title }}">
+                                Modifier
+                            </button>
+                        </form>
+                        <form action="{% url 'delete_review' review.id %}" method="POST">
+                            {% csrf_token %}
+                            <button type="submit" class="button_delete" aria-label="Supprimer la critique {{ review.ticket.title }}">
+                                Supprimer
+                            </button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                </div>
                 {% else %}
                     <p>Aucune critique pour ce ticket.</p>
                 {% endif %}
@@ -56,66 +79,43 @@
         {% endif %}
     {% endfor %}
 
-    <h3>Mes Critiques</h3>
-    {% for post in combined_posts %}
-        {% if post.is_review %}
-            <div class="critique">
-                <div class="review_ticket">
-                    <div class="date_time">
-                        <h4>Critique pour le ticket: {{ post.review.ticket.title }}</h4>
-                        <p class="time">{{ post.review.time_created }}</p>
-                    </div>
-                    <p>{{ post.review.body }}</p>
-                    <span class="star-rating">
-                        {% for i in "12345" %}
-                            {% if forloop.counter <= post.review.rating %}
-                                <i class="fas fa-star checked"></i>
-                            {% else %}
-                                <i class="fas fa-star"></i>
-                            {% endif %}
-                        {% endfor %}
-                    </span>
-                </br>
-                </br>
-                {% if post.review.ticket.image %}
-                        <img src="{{ post.review.ticket.image.url }}" alt="Image pour {{ post.review.ticket.title }}">
-                    {% endif %}
-
-                    <div class="actions">
-                        <a class="button_edit" href="{% url 'edit_review' post.review.id %}">Modifier</a> </br>
-                        <a href="{% url 'delete_review' post.review.id %}" class="button_delete">Supprimer</a>
-                    </div>
+    <h2>Critiques en réponse à mes tickets</h2>
+    {% for review in reviews_response_to_user_ticket %}
+        <div class="critique">
+            <div class="review_ticket" role="region" aria-labelledby="critique-{{ review.id }}">
+                <div class="date_time">
+                    <h3>Critique pour le ticket : {{ review.ticket.title }}</h3>
+                    <p class="time">{{ review.time_created }}</p>
+                </div>
+                <p>{{ review.body }}</p>
+                <span class="star-rating">
+                    {% for i in "12345" %}
+                        {% if forloop.counter <= review.rating %}
+                            <i class="fas fa-star checked" aria-label="Étoile pleine"></i>
+                        {% else %}
+                            <i class="fas fa-star" aria-label="Étoile vide"></i>
+                        {% endif %}
+                    {% endfor %}
+                </span>
+                <br><br>
+                {% if review.ticket.image %}
+                    <img src="{{ review.ticket.image.url }}" alt="Image pour {{ review.ticket.title }}">
+                {% endif %}
+                <div class="actions">
+                    <form action="{% url 'edit_review' review.id %}" method="GET">
+                        <button type="submit" class="button_edit" aria-label="Modifier la critique {{ review.ticket.title }}">
+                            Modifier
+                        </button>
+                    </form>
+                    <form action="{% url 'delete_review' review.id %}" method="POST">
+                        {% csrf_token %}
+                        <button type="submit" class="button_delete" aria-label="Supprimer la critique {{ review.ticket.title }}">
+                            Supprimer
+                        </button>
+                    </form>
                 </div>
             </div>
-        {% endif %}
+        </div>
     {% endfor %}
 
-    <h3>Critiques sur mes Tickets</h3>
-    {% for post in combined_posts %}
-        {% if post.is_review_response_to_user_ticket %}
-            <div class="critique">
-                <div class="review_ticket">
-                    <h4>Critique de {{ post.review.user.username }} pour votre ticket "{{ post.review.ticket.title }}"</h4>
-                    {% if post.review.ticket.image %}
-                        <img src="{{ post.review.ticket.image.url }}" alt="Image pour {{ post.review.ticket.title }}">
-                    {% endif %}
-                    <p>{{ post.review.body }}</p>
-                    <span class="star-rating">
-                        {% for i in "12345" %}
-                            {% if forloop.counter <= post.review.rating %}
-                                <i class="fas fa-star checked"></i>
-                            {% else %}
-                                <i class="fas fa-star"></i>
-                            {% endif %}
-                        {% endfor %}
-                    </span>
-                    <p class="time">{{ post.review.time_created }}</p>
-                </div>
-            </div>
-        {% endif %}
-    {% endfor %}
-
-    {% if post.is_review_response_to_user_ticket %}
-        <p>Aucun ticket ou critique disponible.</p>
-    {% endif %}
 {% endblock %}

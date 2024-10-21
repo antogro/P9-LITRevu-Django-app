@@ -5,6 +5,7 @@ from django.contrib.auth import get_user_model
 from .forms import TicketForm, ReviewForm
 from django.db.models import Prefetch
 from django.contrib import messages
+from itertools import chain
 
 
 @login_required
@@ -18,23 +19,18 @@ def home(request):
     """
     user = request.user
 
-    # Liste des utilisateurs bloqués
     blocked_users = BlockUser.objects.filter(user=user).values_list(
         "blocked_user", flat=True
     )
 
-    # Liste des utilisateurs suivis, en excluant les utilisateurs bloqués
     followed_users = (
         UserFollows.objects.filter(user=user)
         .exclude(followed_user__in=blocked_users)
         .values_list("followed_user", flat=True)
     )
 
-    # Inclure l'utilisateur lui-même dans les utilisateurs suivis
     followed_users = list(followed_users) + [user.id]
 
-    # Récupérer les tickets et critiques des utilisateurs suivis,
-    # en excluant les utilisateurs bloqués
     tickets = (
         Ticket.objects.filter(user__in=followed_users)
         .exclude(user__in=blocked_users)
@@ -90,7 +86,6 @@ def home(request):
 def blocked_user(request):
     """
     Permet de bloquer un utilisateur
-
     """
     user = request.user
     if request.method == "POST":
@@ -172,7 +167,6 @@ def followers(request):
     Permet de voir les utilisateurs qui suivent l'utilisateur connecté
     """
 
-    # Liste les differents utilisateurs
     user = request.user
     followed_users = UserFollows.objects.filter(user=user)
     followers = UserFollows.objects.filter(followed_user=user)
@@ -191,28 +185,27 @@ def followers(request):
 def follow_user(request):
     """
     Permet à l'utilisateur de suivre un autre utilisateur
-
     """
     user = request.user
     followed_username = request.GET.get("username")
 
     if followed_username:
-        # Suivi de l'utilisateur
+
         followed_user = get_object_or_404(
             get_user_model(),
             username=followed_username)
-        if followed_user != user:  # Empêche de se suivre soi-même
+        if followed_user != user:
 
             existing_follow = UserFollows.objects.filter(
                 user=user, followed_user=followed_user
             )
-            # Vérifie si la relation exite déjà
+
             if existing_follow.exists():
                 messages.info(
                     request,
                     f"Vous suivez déjà {followed_user.username}.")
             else:
-                # Crée une nouvelle relation de suivi
+
                 UserFollows.objects.create(
                     user=user,
                     followed_user=followed_user)
@@ -257,16 +250,14 @@ def unfollow_user(request):
 def my_posts(request):
     """
     Permet à l'utilisateur d'afficher ses propres publications.
-    Et bloque l'affichage des publications d'autres utilisateurs bloqué.
+    Et bloque l'affichage des publications d'autres utilisateurs bloqués.
     """
     user = request.user
 
-    # Récuperer les Utilisateurs bloqués
     blocked_users = BlockUser.objects.filter(user=user).values_list(
         "blocked_user", flat=True
     )
-    # Récupérer tous les tickets de l'utilisateur,
-    # avec pré-chargement des critiques associées
+
     user_tickets = (
         Ticket.objects.filter(user=user)
         .exclude(user__in=blocked_users)
@@ -274,53 +265,52 @@ def my_posts(request):
             Prefetch(
                 "review_set",
                 queryset=Review.objects.filter(user=user).exclude(
-                    user__in=blocked_users
-                ),
+                    user__in=blocked_users),
                 to_attr="user_reviews",
             )
         )
         .distinct()
     )
 
-    # Récupérer toutes les critiques de l'utilisateur
     user_reviews = Review.objects.filter(user=user).exclude(
         user__in=blocked_users).select_related("ticket").distinct()
 
     other_user_reviews_on_user_tickets = (
-        Review.objects.filter(ticket__user=user).exclude(
-            user__in=blocked_users).exclude(user=user).distinct()
+        Review.objects.filter(ticket__user=user)
+        .exclude(user__in=blocked_users)
+        .exclude(user=user)
+        .distinct()
     )
 
-    combined_posts = []
-
-    # Ajout des tickets avec leurs critiques associées
-    for ticket in user_tickets:
-        combined_posts.append(
+    combined_posts = list(chain(
+        (
             {
                 "is_ticket": True,
                 "ticket": ticket,
                 "reviews": ticket.user_reviews,
+                "time_created": ticket.time_created
             }
-        )
-
-    # Ajout des critiques de l'utilisateur
-    for review in user_reviews:
-        combined_posts.append(
+            for ticket in user_tickets
+        ),
+        (
             {
                 "is_review": True,
                 "review": review,
+                "time_created": review.time_created
             }
-        )
-
-    # Ajout des critiques faites par d'autres utilisateurs
-    # sur les tickets de l'utilisateur
-    for review in other_user_reviews_on_user_tickets:
-        combined_posts.append(
+            for review in user_reviews
+        ),
+        (
             {
                 "is_review_response_to_user_ticket": True,
                 "review": review,
+                "time_created": review.time_created
             }
-        )
+            for review in other_user_reviews_on_user_tickets
+        ),
+    ))
+
+    combined_posts.sort(key=lambda post: post["time_created"], reverse=True)
 
     context = {
         "combined_posts": combined_posts,
@@ -336,7 +326,7 @@ def create_ticket(request):
     """
     if request.method == "POST":
         form = TicketForm(request.POST, request.FILES)
-        # Vérifie si le formulaire est valide
+
         if form.is_valid():
             ticket = form.save(commit=False)
             ticket.user = request.user
@@ -353,11 +343,8 @@ def create_review(request, ticket_id=None):
     Permet de créer une critique, soit sur un ticket existant,
     soit en créant un nouveau ticket simultanément
     """
-    # Si ticket_id fourni, récupère le ticket ou 404
     ticket = get_object_or_404(Ticket, id=ticket_id) if ticket_id else None
 
-    # Empêcher un utilisateur de soumettre
-    # plusieurs critiques pour le même ticket
     if ticket and Review.objects.filter(
             ticket=ticket,
             user=request.user).exists():
@@ -365,19 +352,15 @@ def create_review(request, ticket_id=None):
             "home"
         )
 
-    # Crée un formulaire de ticket uniquement si pas de ticket existant
     if request.method == "POST":
         review_form = ReviewForm(request.POST)
         ticket_form = TicketForm(
             request.POST, request.FILES) if not ticket else None
 
-        # Vérifie si les formulaires sont valides
         if review_form.is_valid() and (
                 ticket_form is None or ticket_form.is_valid()):
             review = review_form.save(commit=False)
             review.user = request.user
-
-            # Si ticket existant, affecte le ticket
 
             if ticket_form:
                 ticket = ticket_form.save(commit=False)
@@ -405,7 +388,6 @@ def edit_ticket(request, ticket_id):
     """
     Permet à l'utilisateur de modifier un ticket qu'il a créé
     """
-    # Récupère le ticket ou 404, vérifie que l'utilisateur est le propriétaire
     ticket = get_object_or_404(Ticket, id=ticket_id, user=request.user)
     edit_form = TicketForm(instance=ticket)
 
@@ -431,7 +413,6 @@ def edit_review(request, review_id):
     """
     Permet à l'utilisateur de modifier une critique (review) qu'il a créé
     """
-    # Récupère la review ou 404, vérifie que l'utilisateur est le propriétaire
     review = get_object_or_404(Review, id=review_id, user=request.user)
     edit_form = ReviewForm(instance=review)
     if request.method == "POST":
@@ -452,16 +433,13 @@ def delete_ticket(request, ticket_id):
     """
     Permet à l'utilisateur de supprimer un ticket qu'il a créé
     """
-    # Récupère la ticket ou 404, vérifie que l'utilisateur est le propriétaire
     ticket = get_object_or_404(Ticket, id=ticket_id, user=request.user)
 
-    # Supprime le ticket
     if request.method == "POST":
         ticket.delete()
         messages.success(request, "Le ticket a été supprimé avec succès.")
         return redirect("my_posts")
 
-    # Redirige immédiatement si ce n'est pas une requête POST
     return redirect(
         "my_posts"
     )
@@ -472,10 +450,8 @@ def delete_review(request, review_id):
     """
     Permet à l'utilisateur de supprimer une critique (review) qu'il a créé
     """
-    # Récupère la review ou 404, vérifie que l'utilisateur est le propriétaire
     review = get_object_or_404(Review, id=review_id, user=request.user)
 
-    # Protection contre les suppressions accidentelles
     if request.method == "POST":
         review.delete()
         messages.success(request, "La critique a été supprimée avec succès.")
@@ -483,4 +459,4 @@ def delete_review(request, review_id):
 
     return redirect(
         "my_posts"
-    )  # Redirige immédiatement si ce n'est pas une requête POST
+    )

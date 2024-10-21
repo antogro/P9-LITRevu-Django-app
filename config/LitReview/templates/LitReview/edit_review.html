@@ -1,16 +1,29 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h2>Modifier le billet</h2>
-    <form enctype="multipart/form-data" method="post">
+    <h2 class="form-title">Modifier la critique</h2>
+    <form enctype="multipart/form-data" method="post" class="edit-review-form">
         {% csrf_token %}
-        {{ edit_form.as_p }}
-        <button type="submit" name="edit_review">Enregistrer les modification</button>
-    </form>
+        <!-- Champ pour le titre de la critique -->
+        <div class="form-group">
+            <label for="headline" class="form-label">Titre de la critique :</label>
+            <input type="text" id="headline" name="headline" value="{{ edit_form.headline.value }}" required aria-required="true" class="form-input">
+        </div>
 
-    <form method="post">
-        {% csrf_token %}
-        {{ delete_form.as_p }}
-        <button type="submit" name="delete_review" onclick="return confirm('Voulez-vous vraiment supprimer votre review?')">Supprimer la review</button>
+        <!-- Champ pour le corps de la critique -->
+        <div class="form-group">
+            <label for="body" class="form-label">Description :</label>
+            <textarea id="body" name="body" rows="4" class="form-textarea">{{ edit_form.body.value }}</textarea>
+        </div>
+
+        <!-- Champ pour la note -->
+        <div class="form-group">
+            <label for="rating" class="form-label">Note :</label>
+            <input type="number" id="rating" name="rating" value="{{ edit_form.rating.value }}" min="0" max="5" required class="form-input">
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" name="edit_review" class="submit-button">Enregistrer les modifications</button>
+        </div>
     </form>
 {% endblock content %}

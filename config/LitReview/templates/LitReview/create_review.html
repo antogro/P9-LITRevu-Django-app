@@ -1,27 +1,76 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <h2>Créer une critique</h2>
+    <h2 class="form-title">Créer une critique</h2>
 
-  <!-- Formulaire pour créer un nouveau ticket -->
-  <div class="create_ticket">
-  {% if not ticket %}
-    <h3>Créer un nouveau ticket :</h3>
-    <form method="POST" enctype="multipart/form-data">
-      {% csrf_token %}
-      {{ ticket_form.as_p }}
-      <h3>Ajouter votre critique pour ce ticket :</h3>
-      {{ review_form.as_p }}
-      <button type="submit">Soumettre le ticket et la critique</button>
-    </form>
-  {% else %}
-    <!-- Formulaire pour ajouter une critique à un ticket existant -->
-    <h3>Ajouter une critique pour le ticket : "{{ ticket.title }}"</h3>
-    <form method="POST">
-      {% csrf_token %}
-      {{ review_form.as_p }}
-      <button type="submit">Soumettre la critique</button>
-    </form>
-  </div>
-  {% endif %}
-{% endblock %}
+    <!-- Formulaire pour créer un nouveau ticket -->
+    <div class="create_ticket edit-review-form">
+    {% if not ticket %}
+        <h3 class="form-title">Créer un nouveau ticket :</h3>
+        <form method="POST" enctype="multipart/form-data" class="edit-review-form">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="title" class="form-label">Titre du ticket :</label>
+                <input type="text" id="title" name="title" value="{{ ticket_form.title.value|default_if_none:'' }}" required class="form-input">
+            </div>
+
+            <div class="form-group">
+                <label for="description" class="form-label">Description :</label>
+                <textarea id="description" name="description" rows="4" class="form-textarea">{{ ticket_form.description.value|default_if_none:'' }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="image" class="form-label">Image :</label>
+                <input type="file" id="image" name="image" class="form-input">
+            </div>
+
+            <h3 class="form-title">Ajouter votre critique pour ce ticket :</h3>
+            <div class="form-group">
+                <label for="headline" class="form-label">Titre de la critique :</label>
+                <input type="text" id="headline" name="headline" value="{{ review_form.headline.value|default_if_none:'' }}" required class="form-input">
+            </div>
+
+            <div class="form-group">
+                <label for="body" class="form-label">Description :</label>
+                <textarea id="body" name="body" rows="4" class="form-textarea">{{ review_form.body.value|default_if_none:'' }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="rating" class="form-label">Note :</label>
+                <input type="number" id="rating" name="rating" value="{{ review_form.rating.value|default_if_none:'' }}" min="0" max="5" required class="form-input">
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="submit-button">Soumettre le ticket et la critique</button>
+            </div>
+        </form>
+    {% else %}
+        <!-- Formulaire pour ajouter une critique à un ticket existant -->
+        <h3 class="form-title">Ajouter une critique pour le ticket : "{{ ticket.title }}"</h3>
+        <form method="POST" class="edit-review-form">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="headline" class="form-label">Titre de la critique :</label>
+                <input type="text" id="headline" name="headline" value="{{ review_form.headline.value|default_if_none:'' }}" required class="form-input">
+            </div>
+
+            <div class="form-group">
+                <label for="body" class="form-label">Description :</label>
+                <textarea id="body" name="body" rows="4" class="form-textarea">{{ review_form.body.value|default_if_none:'' }}</textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="rating" class="form-label">Note :</label>
+                <input type="number" id="rating" name="rating" value="{{ review_form.rating.value|default_if_none:'' }}" min="0" max="5" required class="form-input">
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="submit-button">Soumettre la critique</button>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+{% endblock content %}
+
