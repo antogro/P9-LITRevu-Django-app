@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
 {% block content %}
     <h2>Mes Publications</h2>
-
+    {% if messages %}
+        {% for message in messages %}
+            {{ message }}
+        {% endfor %}
+    {% endif %}
     {% for item in combined_posts %}
         {% if item.is_ticket %}
             <div class="ticket_and_review">

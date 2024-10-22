@@ -8,14 +8,12 @@
 {% for item in combined %}
     <div class="ticket_and_review">
         {% if item.is_ticket %}
-            <!-- Section pour les tickets avec leurs critiques -->
             {% if item.reviews %}
-                <!-- Affichage des critiques liées au ticket -->
                 <div class="ticket_review">
                     <div class="date_time">
                         <h4>Critiques pour ce ticket</h4>
                         {% for review in item.reviews %}
-                            <p class="time">{{ review.time_created }}</p>
+                            <p class="time">{{ review.time_created|date:"H:i, d F Y" }}</p>
                     </div>
                     <div class="answer_review">
                         <p><strong>{{ review.user }}</strong> a répondu au ticket de <strong>{{ item.ticket.user }}</strong></p>
@@ -35,11 +33,10 @@
                 </div>
             {% endif %}
 
-            <!-- Affichage du ticket -->
             <div class="ticket_review">
                 <div class="date_time">
                     <h4>{{ item.ticket.user }} a demandé une critique</h4>
-                    <p class="time">{{ item.ticket.time_created }}</p>
+                    <p class="time">{{ item.ticket.time_created|date:"H:i, d F Y" }}</p>
                 </div>
                 <div class="ask_review">
                     <strong>{{ item.ticket.title }}</strong>
@@ -57,11 +54,10 @@
             </div>
 
         {% else %}
-            <!-- Section pour les critiques et leurs tickets associés -->
             <div class="ticket_review">
                 <div class="date_time">
                     <h4>Critique par {{ item.review.user }}</h4>
-                    <p class="time">{{ item.review.time_created }}</p>
+                    <p class="time">{{ item.review.time_created|date:"H:i, d F Y" }}</p>
                 </div>
                 <div class="answer_review">
                     <p><strong>{{ item.review.user }}</strong> a répondu au ticket de <strong>{{ item.ticket.user }}</strong></p>
@@ -78,11 +74,10 @@
                     <p>{{ item.review.body }}</p>
                 </div>
             </div>
-                <!-- Ticket associé à la critique -->
                 <div class="review_ticket">
                     <div class="date_time">
                         <h4>Ticket associé</h4>
-                        <p class="time">{{ item.ticket.time_created }}</p>
+                        <p class="time">{{ item.ticket.time_created|date:"H:i, d F Y" }}</p>
                     </div>
                     <div class="ask_review">
                         <strong>{{ item.ticket.title }}</strong>
