@@ -5,7 +5,6 @@ from django.contrib.auth import get_user_model
 from .forms import TicketForm, ReviewForm
 from django.db.models import Prefetch
 from django.contrib import messages
-from itertools import chain
 
 
 @login_required
@@ -247,76 +246,81 @@ def unfollow_user(request):
         return redirect("followers")
 
 
+@login_required
 def my_posts(request):
     """
-    Permet à l'utilisateur d'afficher ses propres publications.
-    Et bloque l'affichage des publications d'autres utilisateurs bloqués.
+    Affiche les posts de l'utilisateur avec leurs critiques associées
+    et les critiques en réponse à ses tickets, même de personnes non suivies.
     """
     user = request.user
-
     blocked_users = BlockUser.objects.filter(user=user).values_list(
         "blocked_user", flat=True
     )
 
+    # Récupère les tickets de l'utilisateur avec leurs critiques
     user_tickets = (
         Ticket.objects.filter(user=user)
         .exclude(user__in=blocked_users)
         .prefetch_related(
             Prefetch(
-                "review_set",
-                queryset=Review.objects.filter(user=user).exclude(
-                    user__in=blocked_users),
-                to_attr="user_reviews",
+                'review_set',
+                queryset=Review.objects.exclude(user__in=blocked_users),
+                to_attr='reviews'
             )
         )
-        .distinct()
+        .order_by('-time_created')
     )
 
-    user_reviews = Review.objects.filter(user=user).exclude(
-        user__in=blocked_users).select_related("ticket").distinct()
+    # Récupère les critiques créées par l'utilisateur
+    user_reviews = (
+        Review.objects.filter(user=user)
+        .exclude(user__in=blocked_users)
+        .select_related('ticket')
+        .order_by('-time_created')
+    )
 
-    other_user_reviews_on_user_tickets = (
+    # Récupère les critiques faites sur les tickets de l'utilisateur
+    reviews_on_user_tickets = (
         Review.objects.filter(ticket__user=user)
         .exclude(user__in=blocked_users)
-        .exclude(user=user)
-        .distinct()
+        .exclude(user=user)  # Exclut les propres critiques de l'utilisateur
+        .select_related('ticket', 'user')
+        .order_by('-time_created')
     )
 
-    combined_posts = list(chain(
-        (
-            {
-                "is_ticket": True,
-                "ticket": ticket,
-                "reviews": ticket.user_reviews,
-                "time_created": ticket.time_created
-            }
-            for ticket in user_tickets
-        ),
-        (
-            {
-                "is_review": True,
-                "review": review,
-                "time_created": review.time_created
-            }
-            for review in user_reviews
-        ),
-        (
-            {
-                "is_review_response_to_user_ticket": True,
-                "review": review,
-                "time_created": review.time_created
-            }
-            for review in other_user_reviews_on_user_tickets
-        ),
-    ))
+    combined_posts = []
 
-    combined_posts.sort(key=lambda post: post["time_created"], reverse=True)
+    # Ajoute les tickets de l'utilisateur
+    for ticket in user_tickets:
+        combined_posts.append({
+            'is_ticket': True,
+            'ticket': ticket,
+            'reviews': ticket.reviews,
+            'time_created': ticket.time_created,
+        })
 
-    context = {
-        "combined_posts": combined_posts,
-    }
+    # Ajoute les critiques créées par l'utilisateur
+    for review in user_reviews:
+        combined_posts.append({
+            'is_user_review': True,
+            'review': review,
+            'time_created': review.time_created,
+        })
 
-    return render(request, "LitReview/my_posts.html", context)
+    # Ajoute les critiques sur les tickets de l'utilisateur
+    for review in reviews_on_user_tickets:
+        combined_posts.append({
+            'is_review_on_user_ticket': True,
+            'review': review,
+            'time_created': review.time_created,
+        })
+
+    # Trie tous les posts par date de création
+    combined_posts.sort(key=lambda x: x['time_created'], reverse=True)
+
+    return render(request, 'LitReview/my_posts.html', {
+        'combined_posts': combined_posts,
+    })
 
 
 @login_required
@@ -414,6 +418,7 @@ def edit_review(request, review_id):
     Permet à l'utilisateur de modifier une critique (review) qu'il a créé
     """
     review = get_object_or_404(Review, id=review_id, user=request.user)
+    ticket = review.ticket  # Récupération du ticket associé à la critique
     edit_form = ReviewForm(instance=review)
     if request.method == "POST":
         if "edit_review" in request.POST:
@@ -423,7 +428,7 @@ def edit_review(request, review_id):
                 edit_form.save()
                 return redirect("my_posts")
 
-    context = {"edit_form": edit_form}
+    context = {"edit_form": edit_form, "ticket": ticket}
 
     return render(request, "LitReview/edit_review.html", context=context)
 

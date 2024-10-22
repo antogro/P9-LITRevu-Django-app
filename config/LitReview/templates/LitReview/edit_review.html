@@ -1,8 +1,21 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h2 class="form-title">Modifier la critique</h2>
+    <h2 class="form-title">Modifier votre critique</h2>
     <form enctype="multipart/form-data" method="post" class="edit-review-form">
+        <div class="ticket_review">
+            <div class="date_time">
+                <h4>{{ ticket.user.username }} a demandé une critique</h4>
+                <p class="time">{{ ticket.time_created|date:"H:i, d F Y" }}</p>
+            </div>
+            <div class="ask_review">
+                <strong>{{ ticket.title }}</strong>
+                <p>{{ ticket.description }}</p>
+                {% if ticket.image %}
+                    <img src="{{ ticket.image.url }}" style="max-height: 400px; width: auto; max-width: 300px;" alt="Image du ticket: {{ ticket.title }}">
+                {% endif %}
+            </div>
+        </div>
         {% csrf_token %}
         <!-- Champ pour le titre de la critique -->
         <div class="form-group">
@@ -23,7 +36,7 @@
         </div>
 
         <div class="form-actions">
-            <button type="submit" name="edit_review" class="submit-button">Enregistrer les modifications</button>
+            <button type="submit" name="edit_review" class="submit-button">Envoyer</button>
         </div>
     </form>
 {% endblock content %}

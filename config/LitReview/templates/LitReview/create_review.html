@@ -46,8 +46,20 @@
             </div>
         </form>
     {% else %}
-        <!-- Formulaire pour ajouter une critique à un ticket existant -->
         <h3 class="form-title">Ajouter une critique pour le ticket : "{{ ticket.title }}"</h3>
+        <div class="ticket_review">
+            <div class="date_time">
+                <h4>{{ ticket.user.username }} a demandé une critique</h4>
+                <p class="time">{{ ticket.time_created|date:"H:i, d F Y" }}</p>
+            </div>
+            <div class="ask_review">
+                <strong>{{ ticket.title }}</strong>
+                <p>{{ ticket.description }}</p>
+                {% if ticket.image %}
+                    <img src="{{ ticket.image.url }}" style="max-height: 400px; width: auto; max-width: 300px;" alt="Image du ticket: {{ ticket.title }}">
+                {% endif %}
+            </div>
+        </div>
         <form method="POST" class="edit-review-form">
             {% csrf_token %}
             
@@ -67,7 +79,7 @@
             </div>
 
             <div class="form-actions">
-                <button type="submit" class="submit-button">Soumettre la critique</button>
+                <button type="submit" class="submit-button">Envoyer</button>
             </div>
         </form>
     </div>

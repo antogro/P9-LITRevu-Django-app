@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
+<div class="signup-container">
+
     <p>{{ message }}</p>
     <form method="post">
         {{ form.as_p }}
@@ -7,5 +9,5 @@
         <button type="submit" >Se connecter</button>
     </form>
     <p>Pas encore membre? <a href="{% url 'signup' %}">Inscrivez-vous maintenant</a></p>
-
+</div>
 {% endblock content %}
