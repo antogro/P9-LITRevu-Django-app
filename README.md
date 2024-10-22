@@ -15,7 +15,7 @@ Bienvenue sur **LITReview**, une application web Django qui permet aux utilisate
 ### Gestion des utilisateurs
 
 - **Création de compte** : Inscription et connexion sécurisées.
-- **Gestion du profil** : Modifiez les informations de votre profil et votre mot de passe.
+- **Gestion du profil** : Modifiez le mot de passe.
 - **Suivi d'utilisateurs** : Suivez d'autres utilisateurs pour voir leurs critiques.
 
 ### Gestion des critiques
