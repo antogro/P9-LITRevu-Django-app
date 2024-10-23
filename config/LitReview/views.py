@@ -198,34 +198,37 @@ def follow_user(request):
     followed_username = request.GET.get("username")
 
     if followed_username:
+        try:
+            # Attempt to retrieve the user to follow
+            followed_user = get_user_model().objects.get(
+                username=followed_username)
 
-        followed_user = get_object_or_404(
-            get_user_model(),
-            username=followed_username)
-        if followed_user != user:
+            if followed_user != user:
+                existing_follow = UserFollows.objects.filter(
+                    user=user, followed_user=followed_user)
 
-            existing_follow = UserFollows.objects.filter(
-                user=user, followed_user=followed_user
-            )
-
-            if existing_follow.exists():
-                messages.info(
-                    request,
-                    f"Vous suivez déjà {followed_user.username}.")
+                if existing_follow.exists():
+                    messages.info(
+                        request,
+                        f"Vous suivez déjà {followed_user.username}.")
+                else:
+                    UserFollows.objects.create(
+                        user=user,
+                        followed_user=followed_user)
+                    messages.success(
+                        request,
+                        f"Vous suivez maintenant {followed_user.username}.")
             else:
-
-                UserFollows.objects.create(
-                    user=user,
-                    followed_user=followed_user)
-                messages.success(
+                messages.error(
                     request,
-                    f"Vous suivez maintenant {followed_user.username}."
-                )
-        else:
+                    "Vous ne pouvez pas vous suivre vous-même.")
+
+        except get_user_model().DoesNotExist:
             messages.error(
                 request,
-                "Vous ne pouvez pas vous suivre vous-même.")
-    return redirect("followers")
+                "Aucun utilisateur ne correspond à ce nom d'utilisateur.")
+
+    return redirect("followers") 
 
 
 @login_required
