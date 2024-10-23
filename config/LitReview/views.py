@@ -89,34 +89,43 @@ def blocked_user(request):
     user = request.user
     if request.method == "POST":
         blocked_username = request.POST.get("blocked_username")
+
         if blocked_username:
-            blocked_user = get_object_or_404(
-                get_user_model(), username=blocked_username
-            )
-            if user != blocked_user:
-                # Bloquer l'utilisateur
-                BlockUser.objects.get_or_create(
-                    user=user,
-                    blocked_user=blocked_user)
+            try:
+                # Attempt to retrieve the user to block
+                blocked_user = get_user_model().objects.get(
+                    username=blocked_username)
 
-                # Désabonner automatiquement des deux côtés
-                UserFollows.objects.filter(
-                    user=user, followed_user=blocked_user
-                ).delete()
-                UserFollows.objects.filter(
-                    user=blocked_user, followed_user=user
-                ).delete()
+                if user != blocked_user:
+                    # Bloquer l'utilisateur
+                    BlockUser .objects.get_or_create(
+                        user=user,
+                        blocked_user=blocked_user
+                    )
 
-                messages.success(request, f"Vous avez bloqué {blocked_user}.")
-            else:
-                messages.error(
-                    request,
-                    "Vous ne pouvez pas vous bloquer vous-même")
+                    # Désabonner automatiquement des deux côtés
+                    UserFollows.objects.filter(
+                        user=user, followed_user=blocked_user
+                    ).delete()
+                    UserFollows.objects.filter(
+                        user=blocked_user, followed_user=user
+                    ).delete()
+
+                    messages.success(
+                        request, f"Vous avez bloqué {blocked_user.username}.")
+                else:
+                    messages.error(request, "Vous ne pouvez pas"
+                                            " vous bloquer vous-même.")
+            except get_user_model().DoesNotExist:
+                messages.error(request, "Aucun utilisateur ne "
+                                        "correspond à ce nom d'utilisateur.")
+
+        return redirect('followers')
 
     # Récupérer toutes les données nécessaires
     followed_users = UserFollows.objects.filter(user=user)
     followers = UserFollows.objects.filter(followed_user=user)
-    blocked_users = BlockUser.objects.filter(user=user)
+    blocked_users = BlockUser .objects.filter(user=user)
 
     context = {
         "user": user,
