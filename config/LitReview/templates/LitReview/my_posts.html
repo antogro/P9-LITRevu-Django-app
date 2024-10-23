@@ -1,133 +1,136 @@
 {% extends 'base.html' %}
 {% block content %}
-    <h2>Mes Publications</h2>
+<h2>Mes Publications</h2>
     {% if messages %}
         {% for message in messages %}
             {{ message }}
         {% endfor %}
     {% endif %}
-    {% for item in combined_posts %}
-        {% if item.is_ticket %}
-            <div class="ticket_and_review">
-                <!-- Section du ticket -->
-                <div class="ticket_review">
-                    <div class="date_time">
-                        <h4>{{ item.ticket.user.username }} a demandé une critique</h4>
-                        <p class="time">{{ item.time_created|date:"H:i, d F Y" }}</p>
-                    </div>
-                    <div class="ask_review">
-                        <strong>{{ item.ticket.title }}</strong>
-                        <p>{{ item.ticket.description }}</p>
-                        {% if item.ticket.image %}
-                            <img src="{{ item.ticket.image.url }}" alt="Image du ticket: {{ item.ticket.title }}" style="max-height: 400px; width: auto; max-width: 300px;">
-                        {% endif %}
-                    </div>
-                    
-                    <div class="actions">
-                        <form action="{% url 'edit_ticket' item.ticket.id %}" method="GET">
-                            <button type="submit" class="button_edit">Modifier</button>
-                        </form>
-                        <form action="{% url 'delete_ticket' item.ticket.id %}" method="POST">
-                            {% csrf_token %}
-                            <button type="submit" class="button_delete">Supprimer</button>
-                        </form>
-                    </div>
-                </div>
+{% for item in combined_posts %}
+    {% if item.is_ticket %}
+    <div class="ticket_and_review">
+        <!-- Section du ticket -->
+        <div class="ticket_review">
+            <div class="date_time">
+                <h4>{{ item.ticket.user.username }} a demandé une critique</h4>
+                <p class="time">{{ item.time_created|date:"H:i, d F Y" }}</p>
+            </div>
+            <div class="ask_review">
+                <strong>{{ item.ticket.title }}</strong>
+                <p>{{ item.ticket.description }}</p>
+                {% if item.ticket.image %}
+                <img src="{{ item.ticket.image.url }}" alt="Image du ticket: {{ item.ticket.title }}"
+                    style="max-height: 400px; width: auto; max-width: 300px;">
+                {% endif %}
             </div>
 
-        {% elif item.is_user_review %}
-            <div class="ticket_and_review">
-                <!-- Section de la critique -->
-                <div class="ticket_review">
-                    <div class="date_time">
-                        <h4>{{ item.review.user.username }} a répondu à la critique</h4>
-                        <p class="time">{{ item.time_created|date:"H:i, d F Y" }}</p>
-                    </div>
-                    <div class="answer_review">
-                        <p><strong>{{ item.review.headline }}</strong></p>
-                        <div class="star-rating">
-                            {% for i in "12345" %}
-                                {% if forloop.counter <= item.review.rating %}
-                                    <i class="fas fa-star checked" aria-label="Étoile pleine"></i>
-                                {% else %}
-                                    <i class="fas fa-star" aria-label="Étoile vide"></i>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                        <p>{{ item.review.body }}</p>
-                    </div>
-                    
-                    <div class="actions">
-                        <form action="{% url 'edit_review' item.review.id %}" method="GET">
-                            <button type="submit" class="button_edit">Modifier</button>
-                        </form>
-                        <form action="{% url 'delete_review' item.review.id %}" method="POST">
-                            {% csrf_token %}
-                            <button type="submit" class="button_delete">Supprimer</button>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Section du ticket associé -->
-                <div class="ticket_review">
-                    <div class="date_time">
-                        <h4>{{ item.review.ticket.user.username }} a demandé une critique</h4>
-                        <p class="time">{{ item.review.ticket.time_created|date:"H:i, d F Y" }}</p>
-                    </div>
-                    <div class="ask_review">
-                        <strong>{{ item.review.ticket.title }}</strong>
-                        <p>{{ item.review.ticket.description }}</p>
-                        {% if item.review.ticket.image %}
-                            <img src="{{ item.review.ticket.image.url }}" alt="Image du ticket: {{ item.review.ticket.title }}" style="max-height: 400px; width: auto; max-width: 300px;">
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-
-        {% elif item.is_review_on_user_ticket %}
-            <div class="ticket_and_review">
-                <!-- Section de la critique reçue -->
-                <div class="ticket_review">
-                    <div class="date_time">
-                        <h4>Critique par {{ item.review.user.username }}</h4>
-                        <p class="time">{{ item.time_created|date:"H:i, d F Y" }}</p>
-                    </div>
-                    <div class="answer_review">
-                        <p><strong>{{ item.review.headline }}</strong></p>
-                        <div class="star-rating">
-                            {% for i in "12345" %}
-                                {% if forloop.counter <= item.review.rating %}
-                                    <i class="fas fa-star checked" aria-label="Étoile pleine"></i>
-                                {% else %}
-                                    <i class="fas fa-star" aria-label="Étoile vide"></i>
-                                {% endif %}
-                            {% endfor %}
-                        </div>
-                        <p>{{ item.review.body }}</p>
-                    </div>
-                </div>
-
-                <!-- Section de votre ticket -->
-                <div class="ticket_review">
-                    <div class="date_time">
-                        <h4>Ticket par {{ item.review.ticket.user.username }}</h4>
-                        <p class="time">{{ item.review.ticket.time_created|date:"H:i, d F Y" }}</p>
-                    </div>
-                    <div class="ask_review">
-                        <strong>{{ item.review.ticket.title }}</strong>
-                        <p>{{ item.review.ticket.description }}</p>
-                        {% if item.review.ticket.image %}
-                            <img src="{{ item.review.ticket.image.url }}" alt="Image du ticket: {{ item.review.ticket.title }}" style="max-height: 400px; width: auto; max-width: 300px;">
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        {% endif %}
-    {% empty %}
-        <div class="ticket_and_review">
-            <div class="ticket_review">
-                <p>Vous n'avez pas encore de publications.</p>
+            <div class="actions">
+                <form action="{% url 'edit_ticket' item.ticket.id %}" method="GET">
+                    <button type="submit" class="button_edit">Modifier</button>
+                </form>
+                <form action="{% url 'delete_ticket' item.ticket.id %}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="button_delete">Supprimer</button>
+                </form>
             </div>
         </div>
-    {% endfor %}
+    </div>
+
+    {% elif item.is_user_review %}
+    <div class="ticket_and_review">
+        <!-- Section de la critique -->
+        <div class="ticket_review">
+            <div class="date_time">
+                <h4>{{ item.review.user.username }} a répondu à la critique</h4>
+                <p class="time">{{ item.time_created|date:"H:i, d F Y" }}</p>
+            </div>
+            <div class="answer_review">
+                <p><strong>{{ item.review.headline }}</strong></p>
+                <div class="star-rating">
+                    {% for i in "12345" %}
+                    {% if forloop.counter <= item.review.rating %} <i class="fas fa-star checked"
+                        aria-label="Étoile pleine"></i>
+                        {% else %}
+                        <i class="fas fa-star" aria-label="Étoile vide"></i>
+                        {% endif %}
+                        {% endfor %}
+                </div>
+                <p>{{ item.review.body }}</p>
+            </div>
+
+            <div class="actions">
+                <form action="{% url 'edit_review' item.review.id %}" method="GET">
+                    <button type="submit" class="button_edit">Modifier</button>
+                </form>
+                <form action="{% url 'delete_review' item.review.id %}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="button_delete">Supprimer</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Section du ticket associé -->
+        <div class="ticket_review">
+            <div class="date_time">
+                <h4>{{ item.review.ticket.user.username }} a demandé une critique</h4>
+                <p class="time">{{ item.review.ticket.time_created|date:"H:i, d F Y" }}</p>
+            </div>
+            <div class="ask_review">
+                <strong>{{ item.review.ticket.title }}</strong>
+                <p>{{ item.review.ticket.description }}</p>
+                {% if item.review.ticket.image %}
+                <img src="{{ item.review.ticket.image.url }}" alt="Image du ticket: {{ item.review.ticket.title }}"
+                    style="max-height: 400px; width: auto; max-width: 300px;">
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% elif item.is_review_on_user_ticket %}
+    <div class="ticket_and_review">
+        <!-- Section de la critique reçue -->
+        <div class="ticket_review">
+            <div class="date_time">
+                <h4>Critique par {{ item.review.user.username }}</h4>
+                <p class="time">{{ item.time_created|date:"H:i, d F Y" }}</p>
+            </div>
+            <div class="answer_review">
+                <p><strong>{{ item.review.headline }}</strong></p>
+                <div class="star-rating">
+                    {% for i in "12345" %}
+                    {% if forloop.counter <= item.review.rating %} <i class="fas fa-star checked"
+                        aria-label="Étoile pleine"></i>
+                        {% else %}
+                        <i class="fas fa-star" aria-label="Étoile vide"></i>
+                        {% endif %}
+                        {% endfor %}
+                </div>
+                <p>{{ item.review.body }}</p>
+            </div>
+        </div>
+
+        <!-- Section de votre ticket -->
+        <div class="ticket_review">
+            <div class="date_time">
+                <h4>Ticket par {{ item.review.ticket.user.username }}</h4>
+                <p class="time">{{ item.review.ticket.time_created|date:"H:i, d F Y" }}</p>
+            </div>
+            <div class="ask_review">
+                <strong>{{ item.review.ticket.title }}</strong>
+                <p>{{ item.review.ticket.description }}</p>
+                {% if item.review.ticket.image %}
+                <img src="{{ item.review.ticket.image.url }}" alt="Image du ticket: {{ item.review.ticket.title }}"
+                    style="max-height: 400px; width: auto; max-width: 300px;">
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% empty %}
+    <div class="ticket_and_review">
+        <div class="ticket_review">
+            <p>Vous n'avez pas encore de publications.</p>
+        </div>
+    </div>
+{% endfor %}
 {% endblock %}

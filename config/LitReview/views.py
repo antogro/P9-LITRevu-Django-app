@@ -228,7 +228,7 @@ def follow_user(request):
                 request,
                 "Aucun utilisateur ne correspond à ce nom d'utilisateur.")
 
-    return redirect("followers") 
+    return redirect("followers")
 
 
 @login_required
